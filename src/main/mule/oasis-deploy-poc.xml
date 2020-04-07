@@ -33,30 +33,4 @@ output application/java
 		<set-variable value="DEPLOYMENT POC SCHEDULER COMPLETED - FOURTH CHANGE" doc:name="Set logPayload" doc:id="5b8bb83c-b351-4a9a-87df-db58067da221" variableName="logPayload" />
 		<flow-ref doc:name="oasis-exit-logger-subflow" doc:id="01a60c2b-b2fb-45f6-9bf0-99268b73c651" name="oasis-exit-logger-subflow" />
 		</flow>
-		<flow name="deployment-poc-another" doc:id="e1f6e611-47ff-47f9-8c5a-bea048b7df83">
-		<scheduler doc:name="Scheduler" doc:id="030b0e9a-211a-42a0-9cc9-b7fea00ee49f" >
-			<scheduling-strategy >
-				<cron expression="0 0 12 ? * MON *" />
-			</scheduling-strategy>
-		</scheduler>
-		<ee:transform doc:name="Transform Message logVars" doc:id="be53c174-1939-484a-a2d0-256f69431bf7">
-			<ee:message>
-			</ee:message>
-			<ee:variables>
-				<ee:set-variable variableName="logVars"><![CDATA[%dw 2.0
-output application/java
----
-{
-	appName: app.name,
-	requestId: uuid() as String,	
-	messageId: uuid() as String
-}]]></ee:set-variable>
-			
-</ee:variables>
-		</ee:transform>
-		<set-variable value="DEPLOYMENT POC SCHEDULER INVOKED" doc:name="logPayload" doc:id="38f860ca-fc69-46a1-90b7-9f3e4503663f" variableName="logPayload" />
-		<flow-ref doc:name="oasis-entry-logger-subflow" doc:id="1d30b0cd-8040-44b8-9f01-be1c3a0be377" name="oasis-entry-logger-subflow" />
-		<set-variable value="DEPLOYMENT POC SCHEDULER COMPLETED" doc:name="Set logPayload" doc:id="b0a12979-3c3b-4408-9e88-19a1b2e7bfcf" variableName="logPayload" />
-		<flow-ref doc:name="oasis-exit-logger-subflow" doc:id="b6403f83-abd5-4fc5-8edd-d76ce3d5e11f" name="oasis-exit-logger-subflow" />
-		</flow>
 	</mule>
