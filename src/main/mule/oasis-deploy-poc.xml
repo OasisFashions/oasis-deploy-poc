@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:http="http://www.mulesoft.org/schema/mule/http"
+	xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core"
+	xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd 
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd">
+		<flow name="deployment-poc" doc:id="5beaff8c-dc04-490a-9a2c-96ab496dfb07">
+		<scheduler doc:name="Scheduler" doc:id="ae4a5623-d5f3-4005-a999-a102b9fc506a" >
+			<scheduling-strategy >
+				<cron expression="0 0 12 ? * MON *" />
+			</scheduling-strategy>
+		</scheduler>
+		<ee:transform doc:name="Transform Message logVars" doc:id="af8facdd-adfb-40e4-a3d9-50584150e843">
+			<ee:message>
+			</ee:message>
+			<ee:variables>
+				<ee:set-variable variableName="logVars"><![CDATA[%dw 2.0
+output application/java
+---
+{
+	appName: app.name,
+	requestId: uuid() as String,	
+	messageId: uuid() as String
+}]]></ee:set-variable>
+			
+</ee:variables>
+		</ee:transform>
+		<set-variable value="DEPLOYMENT POC SCHEDULER INVOKED - SECOND CHANGE" doc:name="logPayload" doc:id="ffb718b9-988d-4129-b96f-780c8eb4fae1" variableName="logPayload" />
+		<flow-ref doc:name="oasis-entry-logger-subflow" doc:id="efdc6b37-73fa-448d-9760-35a8156827ba" name="oasis-entry-logger-subflow" />
+		<set-variable value="DEPLOYMENT POC SCHEDULER COMPLETED - SECOND CHANGE" doc:name="Set logPayload" doc:id="5b8bb83c-b351-4a9a-87df-db58067da221" variableName="logPayload" />
+		<flow-ref doc:name="oasis-exit-logger-subflow" doc:id="01a60c2b-b2fb-45f6-9bf0-99268b73c651" name="oasis-exit-logger-subflow" />
+		</flow>
+	</mule>

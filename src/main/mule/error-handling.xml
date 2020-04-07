@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:cloudhub="http://www.mulesoft.org/schema/mule/cloudhub"
+	xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/cloudhub http://www.mulesoft.org/schema/mule/cloudhub/current/mule-cloudhub.xsd">
+	<cloudhub:config name="CloudHub_Config" doc:name="CloudHub Config" doc:id="af207b73-8b2e-48b9-be29-8a855c5e2ff7" >
+		<cloudhub:connection username="test" password="test" environment="test" />
+	</cloudhub:config>
+	<error-handler name="oasis-error_handler" doc:id="11c0e9c3-e440-4012-914f-1e41ef153d91">
+		<on-error-propagate enableNotifications="true" logException="true" doc:name="HTTP Exception" doc:id="61ab737b-0f99-4c78-90e1-452a15e38239" type="HTTP:BAD_REQUEST, HTTP:CLIENT_SECURITY, HTTP:CONNECTIVITY, HTTP:FORBIDDEN, HTTP:INTERNAL_SERVER_ERROR, HTTP:METHOD_NOT_ALLOWED, HTTP:NOT_ACCEPTABLE, HTTP:NOT_FOUND, HTTP:PARSING, HTTP:RETRY_EXHAUSTED, HTTP:SECURITY, HTTP:SERVICE_UNAVAILABLE, HTTP:TIMEOUT, HTTP:TOO_MANY_REQUESTS, HTTP:UNAUTHORIZED, HTTP:UNSUPPORTED_MEDIA_TYPE">
+			<set-variable value="#[error.description]" doc:name="vErrorPayload" doc:id="91b8ca1f-b3b3-4c61-ae14-6546a8b9488c" variableName="vErrorPayload"/>
+			<ee:transform doc:name="Error Result" doc:id="e5c11385-c1d1-42f2-8b44-1566f418602a" >
+				<ee:message >
+					<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+{
+		"status" : "Error",
+		"code" : "OASERR5004",
+		"message" : "HTTP Error"
+	}
+]]></ee:set-payload>
+				</ee:message>
+				<ee:variables >
+					<ee:set-variable variableName="httpStatus" ><![CDATA[503]]></ee:set-variable>
+				</ee:variables>
+			</ee:transform>
+			<set-variable value="#[payload]" doc:name="logPayload" doc:id="9529e7dc-a526-4725-b85c-b0d31e586bc7" variableName="logPayload"/>
+			<flow-ref doc:name="oasis-error-logger-subflow" doc:id="2fb2abc1-a9c5-4cbc-9f4b-855d70ba5cf5" name="oasis-error-logger-subflow"/>
+			<flow-ref doc:name="s-merret-cloudhub-notifications-subflow" doc:id="40581bc3-192d-4a5d-87c4-26a14d5d33fd" name="s-merret-cloudhub-notifications-subflow"/>
+		</on-error-propagate>
+		<on-error-propagate enableNotifications="true" logException="true" doc:name="Expression Exception" doc:id="c28b6a5b-a451-4f70-baa8-a98fee2cd2b0" type="EXPRESSION">
+			<set-variable value="#[error.errorType.identifier]" doc:name="vErrorPayload" doc:id="af5606d4-ff44-4072-861a-a5452c6e7c40" variableName="generalErrorCode"/>
+			<ee:transform doc:name="Error Result" doc:id="85acac6a-7a20-4a6f-8c96-6556948ede52" >
+				<ee:message >
+					<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+{
+		"status" : "Error",
+		"code" : "OASERR1002",
+		"message" : "Expression Error"
+	}
+]]></ee:set-payload>
+				</ee:message>
+				<ee:variables >
+					<ee:set-variable variableName="httpStatus" ><![CDATA[503]]></ee:set-variable>
+				</ee:variables>
+			</ee:transform>
+			<set-variable value="#[payload]" doc:name="logPayload" doc:id="fb36579d-9d16-403a-955f-2e82fadeeb7c" variableName="logPayload"/>
+			<flow-ref doc:name="oasis-error-logger-subflow" doc:id="cd8934a5-a9fb-485d-8e3c-eeacd8bd706e" name="oasis-error-logger-subflow"/>
+			<flow-ref doc:name="s-merret-cloudhub-notifications-subflow" doc:id="43811eb8-549d-46cf-9f67-794abc197103" name="s-merret-cloudhub-notifications-subflow" />
+		</on-error-propagate>
+	
+</error-handler>
+	<sub-flow name="s-merret-cloudhub-notifications-subflow" doc:id="eb1f249c-8f04-4cb2-9414-e62d2432b21a" >
+		<set-payload value="#[payload]" doc:name="MIME Type to text/plain" doc:id="0bde0b96-c8a8-486f-87f1-0300c93a854b" mimeType="text/plain"/>
+		<ee:transform doc:name="Payload to String" doc:id="25606c7a-8176-48cf-89b4-9a4ae9b9bb69" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/java
+---
+payload as String]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<async doc:name="Async" doc:id="47f7b17a-8805-4120-bea2-2ed4b1472113" >
+			<cloudhub:create-notification doc:name="Create Cloudhub Notification" doc:id="2ff98ab7-679f-4770-bdfb-84b32084f5a2" config-ref="CloudHub_Config" priority="ERROR" domain="test">
+		</cloudhub:create-notification>
+		</async>
+	
+</sub-flow>
+</mule>
