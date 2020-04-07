@@ -28,9 +28,9 @@ output application/java
 			
 </ee:variables>
 		</ee:transform>
-		<set-variable value="DEPLOYMENT POC SCHEDULER INVOKED - SECOND CHANGE" doc:name="logPayload" doc:id="ffb718b9-988d-4129-b96f-780c8eb4fae1" variableName="logPayload" />
+		<set-variable value="DEPLOYMENT POC SCHEDULER INVOKED - THIRD CHANGE" doc:name="logPayload" doc:id="ffb718b9-988d-4129-b96f-780c8eb4fae1" variableName="logPayload" />
 		<flow-ref doc:name="oasis-entry-logger-subflow" doc:id="efdc6b37-73fa-448d-9760-35a8156827ba" name="oasis-entry-logger-subflow" />
-		<set-variable value="DEPLOYMENT POC SCHEDULER COMPLETED - SECOND CHANGE" doc:name="Set logPayload" doc:id="5b8bb83c-b351-4a9a-87df-db58067da221" variableName="logPayload" />
+		<set-variable value="DEPLOYMENT POC SCHEDULER COMPLETED - THIRD CHANGE" doc:name="Set logPayload" doc:id="5b8bb83c-b351-4a9a-87df-db58067da221" variableName="logPayload" />
 		<flow-ref doc:name="oasis-exit-logger-subflow" doc:id="01a60c2b-b2fb-45f6-9bf0-99268b73c651" name="oasis-exit-logger-subflow" />
 		</flow>
 	</mule>
