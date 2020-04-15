@@ -41,7 +41,7 @@ node {
 	properties([
      parameters([
        choiceParam(
-         choices: 'DEV\nSIT\nUAT\nPROD',
+         choices: 'DEV\nSIT\nUAT\nPROD\nTEST',
             description: 'Please select the ENVIRONMENT for Deployment',
             name: 'ENVIRONMENT'
        ),
